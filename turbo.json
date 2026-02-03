@@ -1,0 +1,35 @@
+{
+  "$schema": "https://turborepo.dev/schema.json",
+  "ui": "tui",
+  "tasks": {
+    "build": {
+      "dependsOn": ["^build"],
+      "inputs": ["$TURBO_DEFAULT$", ".env*", "content/**"],
+      "outputs": [".next/**", "!.next/cache/**", ".velite/**"],
+      "env": [
+        "WORKOS_API_KEY",
+        "WORKOS_CLIENT_ID",
+        "WORKOS_COOKIE_PASSWORD",
+        "WORKOS_WEBHOOK_SECRET",
+        "DATABASE_URL",
+        "VERCEL_ENV",
+        "VERCEL_URL",
+        "OUTREACH_CLIENT_ID",
+        "OUTREACH_CLIENT_SECRET",
+        "OUTREACH_REDIRECT_URI",
+        "DEV_URL",
+        "EXA_API_KEY"
+      ]
+    },
+    "lint": {
+      "dependsOn": ["^lint"]
+    },
+    "check-types": {
+      "dependsOn": ["^check-types"]
+    },
+    "dev": {
+      "cache": false,
+      "persistent": true
+    }
+  }
+}
