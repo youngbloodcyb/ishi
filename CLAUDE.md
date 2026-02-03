@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-Outr is an Outreach AI auto-sequencer that creates Outreach sequences with AI-generated personalized email copy. Users create campaigns, define prompts, and assign sending mailboxes. AI-generated emails land in their Outreach tasks queue ready for review/send.
+A modern SaaS starter template with authentication, database, team management, and a marketing site. Built with Next.js, TypeScript, and Tailwind CSS.
 
 ## Commands
 
@@ -26,7 +26,6 @@ pnpm check-types      # Next.js typegen + tsc --noEmit
 pnpm db:generate      # Generate Drizzle migrations
 pnpm db:migrate       # Apply migrations
 pnpm db:studio        # Open Drizzle Studio UI
-pnpm db:seed          # Seed database with test data
 ```
 
 ### Environment Files
@@ -43,7 +42,7 @@ pnpm dev    # Velite watch + Next.js dev at localhost:3001
 ## Architecture
 
 ### Monorepo Structure
-- `apps/main` - Core Outr application (Next.js 16, App Router)
+- `apps/main` - Core application (Next.js 16, App Router)
 - `apps/web` - Marketing site with Velite MDX content
 - `apps/docs` - Internal documentation
 - `packages/ui` - Shared UI components
@@ -55,7 +54,6 @@ pnpm dev    # Velite watch + Next.js dev at localhost:3001
 - **Database:** PostgreSQL (Neon) with Drizzle ORM
 - **Auth:** WorkOS AuthKit
 - **UI:** Tailwind CSS 4, Radix UI, shadcn/ui, Framer Motion
-- **AI:** AI SDK with Vercel AI Gateway
 - **Jobs:** Vercel Workflows for async processing
 
 ### Key Directories (apps/main)
@@ -63,17 +61,14 @@ pnpm dev    # Velite watch + Next.js dev at localhost:3001
 - `components/ui/` - shadcn/ui primitives
 - `lib/db/` - Drizzle schema and migrations
 - `lib/services/` - Server actions with `"use server"` directive
-- `lib/outreach.ts` - Outreach API client
-- `lib/models.ts` - AI model configuration
 - `workflows/` - Vercel Workflow definitions
 
 ### Database Schema
 Key tables in `lib/db/schema.ts`:
-- `users`, `organizations`, `organizationMembers` - WorkOS-synced identity
-- `outreachConnections` - OAuth tokens linking users to Outreach
-- `campaigns` - Campaign config with JSONB data column
-- `contactJobs` - Async contact processing queue
-- `prompts`, `promptVersions` - Reusable prompts with version history
+- `users` - User accounts synced from WorkOS
+- `organizations` - Organizations/teams synced from WorkOS
+- `organizationMembers` - User-organization membership with roles
+- `invitations` - Team invitations
 
 ### Authentication Pattern
 Server actions use `withAuth` from WorkOS AuthKit:
@@ -91,7 +86,7 @@ export async function someAction() {
 ### Vercel Workflows
 Workflows use special directives for durable execution:
 ```typescript
-export async function workflowProcessContact(params) {
+export async function workflowExample(params) {
   "use workflow";  // Marks function as a workflow
   await stepOne();
 }
@@ -102,21 +97,10 @@ const stepOne = async () => {
 };
 ```
 
-### JSONB Typed Columns
-Schema uses typed JSONB for flexible data storage:
-```typescript
-data: jsonb("data").notNull().$type<CampaignData>()
-```
-
-### Outreach Integration
-- OAuth flow stores tokens in `outreachConnections` table
-- Custom fields: `custom80` (subject), `custom81-90` (email bodies)
-- Token auto-refresh when expiring within 5 minutes
-
 ## Conventions
 
 - Path alias `@/*` maps to root directory
-- Route folders are lowercase (e.g., `app/onboarding`)
+- Route folders are lowercase (e.g., `app/settings`)
 - Use `.tsx` for components, `.ts` for utilities
 - Commits: short, present-tense (e.g., "update sidebar")
 - Include issue references when relevant (e.g., `(#3)`)
